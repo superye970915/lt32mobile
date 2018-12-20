@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="lib/fa/css/font-awesome.min.css">
+    <link rel="stylesheet" href="lib/mui/css/mui.min.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/search.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="lt_container">
+        <div class="lt_header">
+            <div class="lt_home"><a href="javascript:history.go(-1);"><i class="mui-icon mui-icon-back"></i></a></div>
+            <div class="lt_brand">
+                <h2>搜索中心</h2>
+            </div>
+        </div>
+        <div class="lt_main">
+            <div class="mui-scroll-wrapper">
+                <div class="mui-scroll">
+                    <div class="lt_searchinput">
+                        <input type="text" placeholder="请搜索" class="search_text">
+                        <button class="mui-btn mui-btn-primary"><i class="mui-icon mui-icon-search"></i></button>
+                    </div>
+                    <!-- 搜索部分 -->
+                    <div class="lt_result">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="lt_footer">
+            <ul>
+                <li><a href="index.html"><i class="fa fa-home"></i>
+                        <p>首页</p>
+                    </a></li>
+                <li><a href="category.html"><i class="fa fa-bars"></i>
+                        <p>分类页</p>
+                    </a></li>
+                <li><a href="cart.html"><i class="fa fa-shopping-cart"></i>
+                        <p>购物车</p>
+                    </a></li>
+                <li><a href="user.html"><i class="fa fa-user"></i>
+                        <p>用户中心</p>
+                    </a></li>
+
+            </ul>
+        </div>
+    </div>
+    <script type="text/html" id="tmp1">
+        {{if arr.length === 0}}
+        <p class="p_10">没有历史记录</p>
+        {{else}}
+
+        <div class="title">
+                <span class="mui-pull-left">搜索历史</span>
+                <span class="mui-pull-right all"><i class="fa fa-trash"></i>清空记录</span>
+            </div>
+            <div class="content">
+                <ul>
+                        {{each arr v i}}
+                        <li><a href="#" class="mui-pull-left every">{{v}}</a><i data-index="{{i}}" class="delete mui-pull-right mui-icon mui-icon-closeempty"></i></li>
+                        {{/each}}
+                </ul>
+            </div>
+       {{/if}}
+    </script>
+    <script src="lib/zepto/zepto.min.js"></script>
+    <script src="lib/artTemplate/template-web.js"></script>
+    <script src="lib/mui/js/mui.js"></script>
+    <script>
+        // var arr = ['匡威', '耐克', '阿迪达斯'];
+        // localStorage.setItem('data', JSON.stringify(arr));
+        render();
+        function getHistory() {
+            var jsonstr = localStorage.getItem('data') || '[]';
+            var arr = JSON.parse(jsonstr);
+            return arr;
+        }
+        function render() {
+            var arr = getHistory();
+            var htmlstr = template('tmp1', { arr: arr });
+            // console.log(htmlstr);
+
+            $('.lt_result').html(htmlstr);
+        }
+
+        // 删除单个
+        $('.lt_result').on('click', '.delete', function () {
+            mui.confirm('Are you sure remove this?', 'Tips', ['sure', 'no'], function (e) {
+                if (e.index == 0) {
+                    var index = $(this).data('index');
+                    var arr = getHistory();
+                    arr.splice(index, 1);
+                    localStorage.setItem('data', JSON.stringify(arr));
+                    render();
+                }
+
+            })
+
+        })
+
+
+        // 清空
+        $('.lt_result').on('click', '.all', function () {
+            mui.confirm('Are you sure delete all the data ? ', 'danger', ['sure', 'no'], function (e) {
+                if (e.index == 0) {
+                    localStorage.removeItem('data');
+                    render();
+                }
+            })
+
+        })
+
+        // 搜索
+        $('.lt_searchinput button').click(function () {
+            var val = $('.search_text').val().trim();
+            var arr = getHistory();
+            if (arr.indexOf(val) >= 0) {
+                var index = arr.indexOf(val);
+                arr.splice(index, 1);
+            }
+
+            arr.unshift(val);
+            if (arr.length >= 10) {
+                arr.pop();
+            }
+            localStorage.setItem('data', JSON.stringify(arr));
+            render();
+            $('.search_text').val('');
+        })
+
+    </script>
+</body>
+
+</html>
